@@ -1,0 +1,36 @@
+version: '2.3'
+services:
+  main:
+    build: .
+    image: hyper-spectrum-image
+    volumes:
+      - .:/app
+      - ./data:/data
+    runtime: nvidia
+  server:
+    image: hyper-spectrum-image
+    ports:
+      - 5000:5000
+    volumes:
+      - .:/app
+      - ./data:/data
+    environment:
+      - MODE=dev
+    command: ["python3", "src/server.py"]
+  tensorboard:
+    image: tensorflow/tensorflow
+    volumes:
+      - ./results:/mounted
+    ports:
+      - 6009:6006
+    command: ["tensorboard", "--logdir=/mounted", "--bind_all"]
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile.jupyter
+    volumes:
+      - .:/code
+      - ./data:/data
+    ports:
+      - 8888:8888
+    command: ["jupyter", "notebook", "--ip='*'", "--NotebookApp.token=''", "--NotebookApp.password=''", "--notebook-dir=/code"]

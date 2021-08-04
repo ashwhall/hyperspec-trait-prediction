@@ -1,0 +1,22 @@
+processing:  data\Mtrx-LMA-Narea-SPAD_forZH.csv LMA_O 0
+train size: 368 val size:52 test size:105
+processing:  data\Mtrx-LMA-Narea-SPAD_forZH.csv Narea_O 0
+train size: 368 val size:52 test size:105
+processing:  data\Mtrx-LMA-Narea-SPAD_forZH.csv SPAD_O 0
+train size: 430 val size:61 test size:123
+processing:  data\Mtrx-LMA-Narea-SPAD_forZH.csv Nmass_O 0
+train size: 430 val size:62 test size:123
+processing:  data\Mtrx-LMA-Narea-SPAD_forZH.csv Parea_O 0
+train size: 304 val size:44 test size:87
+processing:  data\Mtrx-LMA-Narea-SPAD_forZH.csv Pmass_O 0
+train size: 304 val size:44 test size:87
+processing:  data\Out_Mtrx_Vcmax-Vc25-J_forZH.csv Vcmax 1
+train size: 342 val size:49 test size:97
+processing:  data\Out_Mtrx_Vcmax-Vc25-J_forZH.csv Vcmax25 1
+train size: 342 val size:49 test size:97
+processing:  data\Out_Mtrx_Vcmax-Vc25-J_forZH.csv J 1
+train size: 342 val size:49 test size:97
+processing:  data\Out_Mtrx_Vcmax-Vc25-J_forZH.csv Photo_O 1
+train size: 342 val size:49 test size:97
+processing:  data\Out_Mtrx_Vcmax-Vc25-J_forZH.csv Cond_O 1
+train size: 342 val size:49 test size:97

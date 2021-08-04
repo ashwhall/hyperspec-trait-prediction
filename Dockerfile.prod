@@ -1,0 +1,11 @@
+FROM hyper-spectrum-image
+
+COPY src /app
+COPY data /data
+WORKDIR /app
+
+ENV MODE=prod
+ENV DEVICE=cpu
+
+EXPOSE 5000
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "--preload", "--workers=1", "server:app"]

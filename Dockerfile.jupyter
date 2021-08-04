@@ -1,0 +1,5 @@
+FROM jupyter/scipy-notebook
+
+# Dark-mode for Jupyter
+RUN pip install jupyterthemes
+RUN jt -t chesterish -cellw 70%

@@ -1,0 +1,5 @@
+model_type: Linear
+multi_task: true
+include_wavelengths: false
+variable_length: false
+avg_pool: true

@@ -1,0 +1,253 @@
+<!doctype html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <title>Reflectance Dev Server Interface</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+        background-color: #dcdcdc;
+        font-family: "Trebuchet MS", Helvetica, sans-serif;
+        margin-top: 35px;
+        bottom: 35px;
+        }
+        h1 {
+            text-align: center;
+        }
+        #content {
+            margin: auto;
+            display: table;
+            max-width: 650px;
+        }
+        .flex-row {
+            display: flex;
+            flex-direction: row;
+        }
+        .flex-col {
+            display: flex;
+            flex-direction: column;
+        }
+        .well {
+            display: flex;
+            flex-direction: column;
+            min-height: 300px;
+            background-color: #f5f5f5;
+            box-shadow: 5px 5px 8px #aaaaaa;
+        }
+        .well-content {
+            flex: 1;
+            padding: 15px;
+        }
+        #select-model {
+            height: 30px;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .btn-upload {
+            display: inline-block;
+            background-color: mediumseagreen;
+            text-align: center;
+            padding-top: 30px;
+            padding-bottom: 30px;
+            cursor: pointer;
+        }
+        #footer {
+            width: 100%;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        #response-container {
+            margin-top: 10px;
+        }
+        .response-title {
+            margin-top: 2px;
+            margin-left: 10px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .code {
+            color: #444444;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow: auto;
+            border: 1px solid #ddd;
+            word-wrap: break-word;
+            flex: 1;
+        }
+        .response-data {
+            padding: 1em;
+            margin: 0;
+        }
+    </style>
+    <script>
+        const REQUEST_PATH = window.location.origin;
+
+        let input = null;
+        let responseCode = null;
+        let responseText = null;
+        let requestUrlText = null;
+        let modelName = null;
+        function onLoad() {
+            input = document.querySelector('#file-upload');
+            responseCode = document.querySelector('#response-code');
+            responseText = document.querySelector('#response-contents');
+            requestUrlText = document.querySelector('#request-url');
+            modelName = document.querySelector('#select-model');
+            setUrlPath();
+        }
+        function constructUrlPath() {
+            return `${REQUEST_PATH}/predict?model=${modelName.value}`
+        }
+        function setUrlPath() {
+            requestUrlText.innerText = `POST ${constructUrlPath()}`;
+        }
+        function setResponseCode(code='') {
+            responseCode.innerText = code;
+        }
+        function setResponseText(response) {
+            responseText.innerText = response;
+        }
+        function loadFile() {
+            if (input.files.length === 0) {
+                setResponseCode();
+                setResponseText('Must select one .csv file to upload');
+            } else {
+                const file = input.files[0];
+                const formData = new FormData();
+                formData.append('reflectance', file);
+                fetch(constructUrlPath(), { // Your POST endpoint
+                    method: 'post',
+                    body: formData
+                }).then((response) => {
+                    setResponseCode(response.status);
+                    return response.text() // if the response is a JSON object
+                }).then(setResponseText);
+            }
+            input.value = null;
+        }
+    </script>
+</head>
+<body onload="onLoad()">
+    <h1>
+        Trait from Reflectance Dev Server Interface
+    </h1>
+    <div id="content">
+        <div class="flex-col well">
+            <div class="well-content">
+                <p>
+                    This is a test interface for the traits prediction from reflectance server. Ensure
+                    the server is running and that port 5000 is published.
+                </p>
+                <p>
+                    Upload a CSV using the form below, and the server will respond with a list of objects,
+                    where each object consists of key-value pairs of <code>"trait": "predicted_value"</code>.
+                </p>
+                <p>
+                    <b>
+                        The server processes a maximum of 100 samples so if the uploaded CSV has more columns
+                        than this, traits for only the first 100 will be processed and the response code will
+                        be <code>202</code>.
+                    </b>
+                </p>
+                <p>
+                    The expected CSV format is the same as <code>2019-10-22_Population_3_OASS_compiled.csv</code>,
+                    where the first column is the integer wavelengths at which reflectance values were measured,
+                    and each column after this is one set of measurements. It is expected that the CSV has headers,
+                    but we don't care what the header titles are.
+                    If an unsupported CSV format is uploaded, the inputs will be disregarded and unrelated values will be returned.
+                </p>
+            </div>
+            <div class="flex-col" id="footer">
+                <select id="select-model" onchange="setUrlPath()">
+                    <option value="cnn_single">Single-task CNN model</option>
+                    <option value="cnn_multi">Multi-task CNN model</option>
+                    <option value="pls">PLS model</option>
+                    <option value="ensemble">Ensemble (mean(PLS+CNN-multi+CNN-single))</option>
+                </select>
+
+                <label for="file-upload" class="btn-upload">
+                    Select CSV file
+                </label>
+                <input type="file" id="file-upload" name="image" accept=".csv" onchange="loadFile()">
+                <div class="flex-row">
+                    <span class="response-title">Request URL:</span>
+                    <span class="code" id="request-url"></span>
+                </div>
+
+                <div id="response-container">
+                    <span class="response-title">Response:</span>
+                    <span id="response-code"></span>
+                    <pre class="code response-data" id="response-contents">Request not sent</pre>
+                </div>
+            </div>
+    </div>
+        <div>
+            <h3>
+                Additional information:
+            </h3>
+            <p>
+                All returned trait values (including those randomly generated) are in the same distribution as
+                those measured. I.e. the values look like real values.
+            </p>
+            <p>
+                Models:
+            </p>
+            <ul>
+                <li>
+                    <b>Single-task CNN model:</b>
+                    A
+                        <a href="https://brilliant.org/wiki/multivariate-regression/#multiple-regression">multiple-regression</a>
+                        <a href="https://en.wikipedia.org/wiki/Convolutional_neural_network">convolutional neural network</a>
+                    for each predicted trait. Each model is comprised of many
+                        <a href="https://missinglink.ai/guides/keras/keras-conv1d-working-1d-convolutional-neural-networks-keras/#section1">one-dimensional convolution</a>
+                    layers, followed by
+                        <a href="https://missinglink.ai/guides/convolutional-neural-networks/fully-connected-layers-convolutional-neural-networks-complete-guide/">fully-connected layers</a>.
+                </li>
+                <li>
+                    <b>Multi-task CNN model:</b>
+                    A
+                        <a href="https://brilliant.org/wiki/multivariate-regression/#multivariate-regression">multivariate regression</a>
+                        <a href="https://en.wikipedia.org/wiki/Convolutional_neural_network">convolutional neural network</a>
+                    that predicts all trait values concurrently.
+                    Like the single-task CNN, it is comprised of many
+                        <a href="https://missinglink.ai/guides/keras/keras-conv1d-working-1d-convolutional-neural-networks-keras/#section1">one-dimensional convolution</a>
+                    layers, followed by
+                        <a href="https://missinglink.ai/guides/convolutional-neural-networks/fully-connected-layers-convolutional-neural-networks-complete-guide/">fully-connected layers</a>
+                    to make a prediction for each trait.
+                </li>
+                <li>
+                    <b>PLS model:</b>
+                    An individual
+                        <a href="https://en.wikipedia.org/wiki/Partial_least_squares_regression">partial least squares regression</a>
+                    model per trait, which operates on the reflectance measurements alone. Due to the nature of PLS,
+                    this only works on fixed-length inputs (and as such, a few models will be made available for a
+                    selection of spectral ranges).
+                    <br/>
+                    As the PLS model doesn't have the capacity to make predictions for variable spectral ranges, a
+                    small number of separate models have been built using commonly-encountered wavelength ranges (listed
+                    below). The uploaded reflectance data will be trimmed to match PLS model with the most-similar
+                    spectral range. If the CSV data cannot be trimmed to match a model, it will be rejected by the server.
+                    <br/>
+                    PLS Spectral ranges:
+
+                    <ul>
+                        <li><code>[400, 900]</code></li>
+                        <li><code>[400, 1000]</code></li>
+                        <li><code>[400, 1700]</code></li>
+                        <li><code>[400, 2400]</code></li>
+                    </ul>
+                </li>
+                <li>
+                    <b>Ensemble:</b>
+                    An ensemble composed of the PLS, CNN-multi, and CNN-single models. Each of these models makes
+                    a trait prediction, and the ensemble prediction is computed as the mean of these.
+                </li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

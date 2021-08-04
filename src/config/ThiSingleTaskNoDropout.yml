@@ -1,0 +1,7 @@
+model_type: DeepOneDCNN
+multi_task: true
+include_wavelengths: false
+variable_length: true
+CNN_avg_pool_width: 10
+CNN_num_channels: 50
+dropout_percent: "0"
