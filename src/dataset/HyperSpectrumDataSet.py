@@ -14,7 +14,7 @@ LOAD_STORED_STATISTICS = True
 class HyperSpectrumDataSet(Dataset):
     """HyperSpectrum dataset."""
 
-    def __init__(self, c, trait, split, data_dir, dataset='v1'):
+    def __init__(self, c, trait, split, data_dir, dataset='v2_uk'):
         """
         Args:
             trait: "LMA_O", "Narea_O", "SPAD_O", "Nmass_O", "Parea_O", "Pmass_O",

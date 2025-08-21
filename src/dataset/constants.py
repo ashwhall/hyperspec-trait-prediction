@@ -13,13 +13,15 @@ STAT_DUMP_PATH = os.path.join(DATA_DIR, 'statistics.json')
 TRAITS = [
   #"LMA_O",
   #"Narea_O",
-  "SPAD_O",
-  "Nmass_O",
+  #"SPAD_O",
+  "NDVI_O",
+  #"Nmass_O",
   # "Parea_O",
   # "Pmass_O",
-  "Vcmax",
-  "Vcmax25",
-  "J",
+  #"Vcmax",
+  #"Vcmax25",
+  #"J",
+  "TPU",
   #"Photo_O",
   #"Cond_O",
   #"Vcmax25_Narea_O"
@@ -28,7 +30,7 @@ TRAITS = [
 SERVER_PREDICT_TRAITS = TRAITS
 # SERVER_PREDICT_TRAITS = [t for t in SERVER_PREDICT_TRAITS if t not in ['Parea_O', 'Pmass_O']]
 
-def apply_df_filter(df):
-  df['col_index'] = range(0, len(df))
-  df = df.query('Wave_800>0.35').query('Wave_800<0.6')
-  return df
+#def apply_df_filter(df):
+#  df['col_index'] = range(0, len(df))
+#  df = df.query('Wave_800>0.35').query('Wave_800<0.6')
+#  return df

@@ -6,7 +6,7 @@ import pandas as pd
 import constants
 
 
-DATASET_VERSION = 'v1'
+DATASET_VERSION = 'v2_uk'
 
 in_path = os.path.join(constants.DATAFRAME_DIR, f'dataset_{DATASET_VERSION}.csv')
 

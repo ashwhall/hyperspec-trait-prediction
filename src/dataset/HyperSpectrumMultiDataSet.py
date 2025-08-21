@@ -18,10 +18,10 @@ assert not (LOAD_STORED_STATISTICS and STORE_STATISTICS), "Pretty useless to loa
 
 class HyperSpectrumMultiDataSet(Dataset):
     """HyperSpectrum multi-task dataset."""
-    def __init__(self, c, target_traits, split, data_dir, include_wavelengths, variable_length_params=None, dataset_version='v1', oversample=False):
+    def __init__(self, c, target_traits, split, data_dir, include_wavelengths, variable_length_params=None, dataset_version='v2_uk', oversample=False):
       """
       Args:
-          trait: "LMA_O", "Narea_O", "SPAD_O", "Nmass_O", "Parea_O", "Pmass_O",
+          trait: "LMA_O", "Narea_O", "SPAD_O", "NDVI_O", "TPU", "Nmass_O", "Parea_O", "Pmass_O",
                   "Vcmax", "Vcmax25", "J", "Photo_O", "Cond_O"
           split: "train", "val", "test"
       """
@@ -40,6 +40,8 @@ class HyperSpectrumMultiDataSet(Dataset):
                                                                                weight_datasets=oversample)
 
       self._sample_weights = sample_weights
+      print(data_dir)
+      
       if self._sample_weights is not None:
         self._sample_weights = np.array([sample_weights[i] for i in split_indices])
 
@@ -73,19 +75,64 @@ class HyperSpectrumMultiDataSet(Dataset):
       for trait in traits:
         # normalize traits
         train_df = data.loc[all_split_indices['train'], [trait]]
+        print(train_df)
+        
+        train_df = train_df.replace("NS", np.nan)
+        print(train_df)
+        train_df = train_df.replace("0", np.nan)
+    
         train_df = train_df.dropna(axis=0, how='any')
+        
+        def split_fixed_width_numbers(s, width=8):
+            numbers = []
+            for i in range(0, len(s), width):
+                chunk = s[i:i+width]
+                try:
+                    numbers.append(float(chunk))
+                except ValueError:
+                    continue
+            return numbers
+
+        cleaned_values = []
+        for val in train_df[trait].astype(str):
+            val = val.strip()
+            if val.replace(".", "").isnumeric() and len(val) > 10:
+                cleaned_values.extend(split_fixed_width_numbers(val))
+            else:
+                try:
+                    cleaned_values.append(float(val))
+                except ValueError:
+                    pass
+
+        train_df = pd.DataFrame({trait: cleaned_values})
+
 
         # Uncomment the below to normalise traits using the loaded statistics
         # if statistics is not None:
         #   trait_average = statistics['traits']['mean'][trait]
         #   trait_std = statistics['traits']['std'][trait]
-        # else:
+        # else:d
+
+        #import code
+        #code.interact(local=locals())
+        #train_df.mean()
+
         trait_average = train_df.mean().values.astype(np.float32)
         trait_average = trait_average.item()
         trait_std = train_df.std().values.astype(np.float32)
         trait_std = trait_std.item()
 
-        data.loc[split_indices, [trait]] = data.loc[split_indices, [trait]] - trait_average
+        try:
+            data.loc[split_indices, [trait]] = data.loc[split_indices, [trait]] - trait_average
+        except Exception as e:
+            print(e)
+            print(type(trait_average), trait_average)
+            print(type(data.loc[split_indices, [trait]]), data.loc[split_indices, [trait]])
+            
+            import code
+            code.interact(local=locals())
+            train_df.mean()
+        
         data.loc[split_indices, [trait]] = data.loc[split_indices, [trait]] / trait_std
         self.trait_averages[trait] = trait_average
         self.trait_stds[trait] = trait_std
@@ -111,6 +158,9 @@ class HyperSpectrumMultiDataSet(Dataset):
       mean = np.mean(labels_numpy)
       self.sq_diff = np.sum(np.square(labels_numpy - mean))
       self.split_indices = split_indices
+
+      import code
+#      code.interact(local=locals())
 
     def get_oversampler(self):
       return OverSampler(self._sample_weights)

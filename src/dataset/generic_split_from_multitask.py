@@ -6,10 +6,11 @@ import pandas as pd
 import constants
 
 
-DATASET_VERSION = 'v1'
+DATASET_VERSION = 'v2_uk'
 
 in_path = os.path.join(constants.SPLIT_DIR, f'split_multitask_{DATASET_VERSION}.npz')
 df_path = os.path.join(constants.DATAFRAME_DIR, f'dataset_{DATASET_VERSION}.csv')
+
 
 def print_split_percent(train, val, test):
   train, val, test = len(train), len(val), len(test)
@@ -43,6 +44,8 @@ def save(trait, train, val, test):
 
 print("Processing: ", DATASET_VERSION)
 df = pd.read_csv(df_path)
+df = df.rename(columns={"SPAD": "SPAD_O", "NDVI": "NDVI_O", "Nmass": "Nmass_O"})
+print(df.columns)
 df['col_index'] = range(0, len(df))
 
 multi_splits = dict(np.load(in_path))

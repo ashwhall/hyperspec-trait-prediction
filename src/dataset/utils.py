@@ -12,14 +12,28 @@ except ImportError:
 
 
 
+#def build_file_path_dicts():
+#  """Build a dict of { version: path } pairs. E.g. { v1: 'dataset_v1.csv' }"""
+#  file_paths = os.listdir(constants.DATAFRAME_DIR)
+#  file_paths = {
+#    re.search('_(.*)\.', d).group(1): os.path.join(constants.DATAFRAME_DIR, d)
+#    for d in file_paths
+#  }
+#  return file_paths
+
 def build_file_path_dicts():
-  """Build a dict of { version: path } pairs. E.g. { v1: 'dataset_v1.csv' }"""
-  file_paths = os.listdir(constants.DATAFRAME_DIR)
-  file_paths = {
-    re.search('_(.*)\.', d).group(1): os.path.join(constants.DATAFRAME_DIR, d)
-    for d in file_paths
-  }
-  return file_paths
+    """Build a dict of { version: path } pairs. E.g. { v2_uk: 'dataset_v2_uk.csv' }"""
+    file_paths = os.listdir(constants.DATAFRAME_DIR)
+    out = {}
+    for d in file_paths:
+        match = re.search(r'_(.*)\.', d)
+        if match:
+            out[match.group(1)] = os.path.join(constants.DATAFRAME_DIR, d)
+        else:
+            print(f"[Skipping] Filename does not match expected pattern: {d}")
+    return out
+
+
 
 FILE_PATHS = build_file_path_dicts()
 MULTITASK_SPLIT_PATHS = {
@@ -174,6 +188,7 @@ def _read_data_individual(dataset, split, target_traits):
 
   all_split_indices = {}
   is_multitask = isinstance(target_traits, list)
+  print(f"target_traits '{target_traits}'")
   if is_multitask:
     for trait in target_traits:
       if trait not in constants.TRAITS:

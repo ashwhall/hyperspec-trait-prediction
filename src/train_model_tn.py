@@ -14,10 +14,20 @@ from models.utils import load_model
 import multitask_learning as multitask
 
 
+import pandas as pd
+import numpy as np
+
+
 def convert_df(data_dict, column_name):
     df = pd.DataFrame.from_dict(data_dict, orient='index')
     df = df.rename(index=str, columns={0: column_name})
+
+    # Replace NS and 0 with NaN
+    #df = df.replace("NS", np.nan)
+    #df = df.replace("0", np.nan)
+
     return df
+
 
 def write_out_results(result_file, results):
     total = 0.0
@@ -119,7 +129,12 @@ def main():
         model.summary((input_channels, input_dim))
 
         print('setup optimiser')
-        optimizer = optim.Adam(model.parameters(), lr=c.lr, weight_decay=c.weight_decay)
+        optimizer = optim.Adam(
+            model.parameters(),
+            lr=c.lr,
+            weight_decay=c.weight_decay
+        )
+
         # fix seed
         # np.random.seed(1000)
 

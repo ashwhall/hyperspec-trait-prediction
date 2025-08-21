@@ -1,0 +1,27 @@
+# --- General Configuration ---
+exp_desc: Final fine-tuning on my custom data
+model_type: DeepOneDCNN
+multi_task: True
+result_dir: ./output_final_finetuned
+
+# --- Transfer Learning Configuration ---
+#load_pretrained_model: /app/mounted/singletask_SPAD_20250817-223249/model.pth
+load_pretrained_model: /app/mounted/singletask_SPAD_finetunning_trial_20250819-165448/model.pth
+# trained with only ["SPAD_O"]
+
+# --- Data Configuration ---
+#dataset: 'final_processed'
+#traits: "['SPAD', 'NDVI', 'VcMax', 'J', 'TPU', 'Nmass']"
+
+# --- Model Architecture (DEFINITIVE) ---
+# These values now perfectly match the pre-trained model's architecture.
+CNN_num_channels: 300
+CNN_avg_pool_width: 10
+CNN_kernel_size: 5
+conv_dilations: "[2, 2, 2, 2]"
+
+# --- Fine-Tuning Parameters ---
+num_epochs: 300
+batch_size: 8
+lr: 0.00001
+dropout_percent: 0.2

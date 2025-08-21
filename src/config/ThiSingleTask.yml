@@ -1,4 +1,5 @@
 model_type: DeepOneDCNN
+#data_dir : /home/yoon/Documents/bob_ml/hyperspec-trait-prediction/data/processed/
 multi_task: true
 include_wavelengths: false
 variable_length: true

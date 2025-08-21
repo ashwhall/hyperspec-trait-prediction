@@ -82,7 +82,7 @@ def arg_parse():
     parser.add_argument("--data_aug_type", dest="data_aug_type", help="data_augmentation type", default="None", type=str)
     parser.add_argument("--data_aug_percent", dest="data_aug_percent", help="data augmentation percent", default=0.0, type=float)
     parser.add_argument("--data_aug_rate", dest="data_aug_rate", help="data augmentation rate", default=0.0, type=float)
-    parser.add_argument("--dataset", dest="dataset", help="dataset version", default="v1", type=str)
+    parser.add_argument("--dataset", dest="dataset", help="dataset version", default="v2_uk", type=str)
     parser.add_argument("--include_wavelengths", dest="include_wavelengths", default=False, help="Stack the wavelength with frequency response for inputs", action='store_true')
     parser.add_argument("--variable_length", dest="variable_length", default=False, help="If True, the length of the spectra varies per sample", action="store_true")
     parser.add_argument("--conv_dilations", dest="conv_dilations", default=None, help="List of dilation rates for conv layers - as a string", type=str)
@@ -97,8 +97,8 @@ def arg_parse():
     parser.add_argument("--test_dataset", dest="test_dataset", default="test", help="Which dataset partition to test models on - should probably be either 'test' or 'all'", type=str)
     parser.add_argument("--model_summary", dest="model_summary", help="Prints model summary when used with config.py.__main__", default=False, action='store_true')
     parser.add_argument("--rng_seed", dest="rng_seed", help="Set a specific seed value", default=1000, type=int)
-    parser.add_argument("--checkpoint_filepath", dest="checkpoint_filepath", help="Set the filepath for loading existing weights", default=None, type=str)
-
+    parser.add_argument("--checkpoint_filepath", dest="checkpoint_filepath", help="Set the filepath for loading existing weights, i.e. '/app/mounted/multitask_SPAD_20250813-171141/model.pth.tar'", default=None, type=str)
+    parser.add_argument("--load_pretrained_model", dest="load_pretrained_model", help="For example, in the format of: 'mounted/<desc>/<filename>.pth'", type=str, default=None) #TODO: remove one of these
     args = parser.parse_args()
     use_cuda = torch.cuda.is_available()
     args.device = torch.device(args.gpu_device if use_cuda else "cpu")

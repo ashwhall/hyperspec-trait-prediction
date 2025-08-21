@@ -77,15 +77,15 @@ if __name__ == '__main__':
     torch.backends.cudnn.benchmark = True
 
     result_dir = os.path.join(c.result_dir, c.exp_desc)
-    model_path = os.path.join(result_dir, 'model.pth.tar')
+    model_path = os.path.join(result_dir, 'model.pth') #was model.pth.tar
     filter_str = ''
     if c.data_filter is not None:
       prefix = '' if c.data_filter[0] == 'col_val' else 'not'
       filter_str = '_' + prefix + c.data_filter[1]['value_match_str']
-    results_path = os.path.join(result_dir, f'eval_results_{c.dataset}{filter_str}.bin')
-    results_corr_path = os.path.join(result_dir, f'eval_results_corr_{c.dataset}{filter_str}.bin')
-    predictions_path = os.path.join(result_dir, f'eval_preds_{c.dataset}{filter_str}.bin')
-    best_and_worst_path = os.path.join(result_dir, f'eval_bestworst_{c.dataset}{filter_str}.bin')
+    results_path = os.path.join(result_dir, f'eval_results_{c.dataset}{filter_str}.txt')
+    results_corr_path = os.path.join(result_dir, f'eval_results_corr_{c.dataset}{filter_str}.txt')
+    predictions_path = os.path.join(result_dir, f'eval_preds_{c.dataset}{filter_str}.txt')
+    best_and_worst_path = os.path.join(result_dir, f'eval_bestworst_{c.dataset}{filter_str}.txt')
 
     if not os.path.exists(result_dir):
         raise ValueError("Experiment doesn't exist: " + result_dir)

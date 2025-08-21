@@ -27,7 +27,7 @@ def load_ds(c, traits,
             include_wavelengths=False,
             augmentation=None,
             variable_length_params=None,
-            dataset_version='v1',
+            dataset_version='v2_uk',
             oversample=False,
             shuffle=True):
     ds = hsmd.HyperSpectrumMultiDataSet(c, traits,
@@ -58,11 +58,13 @@ def load_ds(c, traits,
 
 def filter_nan_labels(preds, labels, return_indices=False):
   """Drop predictions and labels where the label is nan (missing vals)"""
+  #print('\n\nfilter_nan_labels', len(preds), len(labels), '\n', preds, '\n', labels)
   nan_mask = torch.isnan(labels)
   unmasked_indices = torch.nonzero(nan_mask == 0)[:, 0]
   labels = labels[unmasked_indices]
   preds = preds[unmasked_indices]
 
+  #print('\n\nfilter_nan_labels completed:', len(preds), len(labels), '\n', preds, '\n', labels, '-'*10)
   if return_indices:
     return preds, labels, unmasked_indices
   return preds, labels
@@ -326,7 +328,7 @@ def train_multitask_learning_v2(c, model, criterion, optimizer, traits, data_dir
             traits_outputs = traits_outputs.cpu()
 
             # forward + backward + optimize
-            loss = 0
+            """loss = 0
             for idx, trait in enumerate(traits):
                 labels = traits_labels[:, idx].unsqueeze(1)
                 outputs = traits_outputs[:, idx].unsqueeze(1)
@@ -338,13 +340,39 @@ def train_multitask_learning_v2(c, model, criterion, optimizer, traits, data_dir
 
                   # compute r square
                   diff = outputs - labels
-                  pred_sq_diffs[trait] += torch.sum(torch.mul(diff, diff), 0).detach().numpy()
+                  pred_sq_diffs[trait] += torch.sum(torch.mul(diff, diff), 0).detach().numpy()"""
+
+            loss = 0
+            for idx, trait in enumerate(traits):
+                labels = traits_labels[:, idx].unsqueeze(1)
+                outputs = traits_outputs[:, idx].unsqueeze(1)
+                #print('\n\n', 'traits_outputs', traits_outputs, '\n')
+                #print('\n\n', 'traits_labels', traits_labels, '\n')
+                outputs, labels = filter_nan_labels(outputs, labels)
+                # sum all loss for each trait
+
+
+                try:
+                    assert len(outputs) == len(labels)
+                    assert len(labels) != 0
+                except:
+                    import code
+                    #code.interact(local=locals())
+
+                if len(outputs) > 0:
+                    criteria = criterion(outputs, labels)
+                    loss += criteria
+
+                    # compute r square
+                    diff = outputs - labels
+                    pred_sq_diffs[trait] += torch.sum(torch.mul(diff, diff), 0).detach().numpy()
 
             loss.backward()
 
             optimizer.step()
 
             running_loss += loss.item()
+
         epoch_end_time = time()
         time_per_example = (epoch_end_time - epoch_start_time) / examples_per_epoch
         time_per_example_ma = MA * time_per_example_ma + (1 - MA) * time_per_example

@@ -15,7 +15,7 @@ MODEL_MULTI = 'ThiMultiTask'
 VARIANT_MULTI = 'base'
 MODEL_PLS = 'pls'
 VARIANT_PLS = 'base'
-TRAIN_DS = 'v1'
+TRAIN_DS = 'v2_uk'
 WEIGHTS_FILE = 'model.pth.tar'
 PLS_WEIGHTS_FILE = 'models.bin'
 
